@@ -1,4 +1,7 @@
-// This is a ufs server.
+// UFS is a userspace server which exports a filesystem over 9p(2000).
+//
+// By default, it will export / over a TCP on port 5640 under the username
+// of "harvey".
 package main
 
 import (
@@ -6,8 +9,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/Harvey-OS/ninep/protocol"
 	"github.com/Harvey-OS/ninep/filesystem"
+	"github.com/Harvey-OS/ninep/protocol"
 )
 
 var (
@@ -30,11 +33,11 @@ func main() {
 
 		_, err = ufs.NewUFS(func(s *protocol.Server) error {
 			s.FromNet, s.ToNet = c, c
-			s.Trace = nil  // log.Printf
+			s.Trace = nil // log.Printf
 			return nil
 		})
 		if err != nil {
-		   log.Printf("Error: %v", err)
+			log.Printf("Error: %v", err)
 		}
 	}
 
