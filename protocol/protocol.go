@@ -6,17 +6,16 @@ package protocol
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"io"
-	"os"
-	"flag"
-	"runtime"
-	"log"
-	"path/filepath"
-	"runtime/pprof"
 	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
+	"runtime/pprof"
 	"sync/atomic"
-	
 )
 
 var serverprofile = flag.String("serverprofile", "", "This is for specifying the prefix of the output file for the profile")
