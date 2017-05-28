@@ -1,4 +1,4 @@
-// UFS is a userspace server which exports a filesystem over 9p(2000).
+// UFS is a userspace server which exports a filesystem over 9p2000.
 //
 // By default, it will export / over a TCP on port 5640 under the username
 // of "harvey".
