@@ -98,7 +98,7 @@ func (e FileServer) Rattach(fid protocol.FID, afid protocol.FID, uname string, a
 	return r.QID, nil
 }
 
-func (e FileServer) Rflush(f protocol.FID, t protocol.FID) error {
+func (e FileServer) Rflush(o protocol.Tag) error {
 	return nil
 }
 

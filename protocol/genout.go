@@ -400,20 +400,14 @@ err = fmt.Errorf("Packet too long: %d bytes left over after decode", b.Len())
 }
 return
 }
-func MarshalTflushPkt (b *bytes.Buffer, t Tag, RFID FID, OFID FID) {
+func MarshalTflushPkt (b *bytes.Buffer, t Tag, OTag Tag) {
 var l uint64
 b.Reset()
 b.Write([]byte{0,0,0,0,
 uint8(Tflush),
 byte(t), byte(t>>8),
-	uint8(RFID>>0),
-	uint8(RFID>>8),
-	uint8(RFID>>16),
-	uint8(RFID>>24),
-	uint8(OFID>>0),
-	uint8(OFID>>8),
-	uint8(OFID>>16),
-	uint8(OFID>>24),
+	uint8(OTag>>0),
+	uint8(OTag>>8),
 	})
 
 {
@@ -422,7 +416,7 @@ copy(b.Bytes(), []byte{uint8(l), uint8(l>>8), uint8(l>>16), uint8(l>>24)})
 }
 return
 }
-func UnmarshalTflushPkt (b *bytes.Buffer) (RFID FID, OFID FID,  t Tag, err error) {
+func UnmarshalTflushPkt (b *bytes.Buffer) (OTag Tag,  t Tag, err error) {
 var u [8]uint8
 var l uint64
 if _, err = b.Read(u[:2]); err != nil {
@@ -431,22 +425,12 @@ return
 }
 l = uint64(u[0]) | uint64(u[1])<<8
 t = Tag(l)
-	if _, err = b.Read(u[:4]); err != nil {
-		err = fmt.Errorf("pkt too short for uint32: need 4, have %d", b.Len())
+	if _, err = b.Read(u[:2]); err != nil {
+		err = fmt.Errorf("pkt too short for uint16: need 2, have %d", b.Len())
 	return
 	}
-	RFID = FID(u[0])
-	RFID |= FID(u[1])<<8
-	RFID |= FID(u[2])<<16
-	RFID |= FID(u[3])<<24
-	if _, err = b.Read(u[:4]); err != nil {
-		err = fmt.Errorf("pkt too short for uint32: need 4, have %d", b.Len())
-	return
-	}
-	OFID = FID(u[0])
-	OFID |= FID(u[1])<<8
-	OFID |= FID(u[2])<<16
-	OFID |= FID(u[3])<<24
+	OTag = Tag(u[0])
+	OTag |= Tag(u[1])<<8
 
 if b.Len() > 0 {
 err = fmt.Errorf("Packet too long: %d bytes left over after decode", b.Len())
@@ -454,10 +438,10 @@ err = fmt.Errorf("Packet too long: %d bytes left over after decode", b.Len())
 return
 }
 func (s *Server) SrvRflush(b*bytes.Buffer) (err error) {
-	RFID, OFID,  t, err := UnmarshalTflushPkt(b)
+	OTag,  t, err := UnmarshalTflushPkt(b)
 	//if err != nil {
 	//}
-	if  err := s.NS.Rflush(RFID, OFID); err != nil {
+	if  err := s.NS.Rflush(OTag); err != nil {
 	MarshalRerrorPkt(b, t, fmt.Sprintf("%v", err))
 } else {
 	MarshalRflushPkt(b, t, )
@@ -465,13 +449,13 @@ func (s *Server) SrvRflush(b*bytes.Buffer) (err error) {
 	return nil
 }
 
-func (c *Client)CallTflush (RFID FID, OFID FID) ( err error) {
+func (c *Client)CallTflush (OTag Tag) ( err error) {
 var b = bytes.Buffer{}
 if c.Trace != nil {c.Trace("%v", Tflush)}
 t := Tag(0)
 r := make (chan []byte)
 if c.Trace != nil { c.Trace(":tag %v, FID %v", t, c.FID)}
-MarshalTflushPkt(&b, t, RFID, OFID)
+MarshalTflushPkt(&b, t, OTag)
 c.FromClient <- &RPCCall{b: b.Bytes(), Reply: r}
 bb := <-r
 if MType(bb[4]) == Rerror {

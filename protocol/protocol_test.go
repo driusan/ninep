@@ -221,13 +221,13 @@ func (e *echo) Rattach(FID, FID, string, string) (QID, error) {
 	return QID{}, nil
 }
 
-func (e *echo) Rflush(f FID, t FID) error {
-	switch int(f) {
-	case 2:
+func (e *echo) Rflush(o Tag) error {
+	switch o {
+	case 3:
 		// Make it fancier, later.
 		return nil
 	}
-	return fmt.Errorf("Read: bad FID %v", f)
+	return fmt.Errorf("Rflush: bad Tag %v", o)
 }
 
 func (e *echo) Rwalk(fid FID, newfid FID, paths []string) ([]QID, error) {
@@ -483,11 +483,11 @@ func TestTMessages(t *testing.T) {
 	if err := c.CallTwstat(FID(1), []byte{}); err == nil {
 		t.Fatalf("CallTwstat: want err, got nil")
 	}
-	if err := c.CallTflush(FID(2), FID(3)); err != nil {
+	if err := c.CallTflush(3); err != nil {
 		t.Fatalf("CallTflush: want nil, got %v", err)
 	}
 
-	if err := c.CallTflush(FID(1), FID(3)); err == nil {
+	if err := c.CallTflush(2); err == nil {
 		t.Fatalf("CallTflush: want err, got nil")
 	}
 }

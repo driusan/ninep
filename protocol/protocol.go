@@ -199,8 +199,7 @@ type RattachPkt struct {
 }
 
 type TflushPkt struct {
-	RFID FID
-	OFID FID
+	OTag Tag
 }
 
 type RflushPkt struct {
@@ -358,7 +357,7 @@ type NineServer interface {
 	Rremove(FID) error
 	Rread(FID, Offset, Count) ([]byte, error)
 	Rwrite(FID, Offset, []byte) (Count, error)
-	Rflush(FID, FID) error
+	Rflush(Otag Tag) error
 }
 
 var (
